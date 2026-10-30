@@ -34,7 +34,7 @@ class DialogTest extends TestCase
 		$this->assertStringContainsString('<strong>example.com</strong>', (string)$dialog['props']['fields']['domain']['text']);
 		$this->assertSame('text', $dialog['props']['fields']['key']['type']);
 		$this->assertTrue($dialog['props']['fields']['key']['required']);
-		$this->assertStringContainsString('href="https://owebstudio.com/test"', (string)$dialog['props']['fields']['key']['help']);
+		$this->assertStringContainsString('href="https://owebstudio.lemonsqueezy.com/checkout/buy/test"', (string)$dialog['props']['fields']['key']['help']);
 		$this->assertSame('Activate', $dialog['props']['submitButton']['text']);
 		$this->assertNull($dialog['props']['value']['key']);
 	}

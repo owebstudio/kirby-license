@@ -1,6 +1,6 @@
 # oweb studio license for Kirby
 
-The license check of the paid [oweb studio](https://owebstudio.com) plugins for [Kirby](https://getkirby.com). It validates [Lemon Squeezy](https://www.lemonsqueezy.com) license keys and shows the license in the Panel.
+The license check of the paid [oweb studio](https://github.com/owebstudio) plugins for [Kirby](https://getkirby.com). It validates [Lemon Squeezy](https://www.lemonsqueezy.com) license keys and shows the license in the Panel.
 
 You don't need to install this package yourself. Every paid oweb studio plugin comes with its own copy.
 
@@ -66,7 +66,7 @@ $license = new License(
     plugin: 'owebstudio/instagram-feed',
     products: [123456],
     name: 'Instagram Feed',
-    url: 'https://owebstudio.com/kirby/plugins/instagram-feed'
+    url: 'https://owebstudio.lemonsqueezy.com/checkout/buy/29afd8d3-78d4-4cd5-a19b-a13c3d3b5e1b'
 );
 
 Kirby::plugin(
@@ -79,6 +79,7 @@ Kirby::plugin(
 ```
 
 - `products`: the plugin's own Lemon Squeezy product IDs. The legacy bundle is accepted automatically.
+- `url`: the plugin's Lemon Squeezy checkout, linked as "Buy a license" in the license dialog.
 - `extend()` adds the license dialog to the Panel's system area.
 - `args()` adds the license to the System view on Kirby 5 and newer. Kirby 4 has no plugin licenses, so it adds nothing there. Pass it as the last argument, after the positional ones.
 
@@ -102,7 +103,7 @@ Kirby::plugin(
 [
     'button'  => 'Activate',  // label for the dialog button
     'dialog'  => 'oweb-license/owebstudio/instagram-feed', // null for non-admins
-    'link'    => 'https://owebstudio.com/…',
+    'link'    => 'https://owebstudio.lemonsqueezy.com/checkout/buy/…',
     'locked'  => true,
     'message' => 'Instagram Feed is not activated on example.com.',
     'status'  => 'missing',   // active, exempt, invalid, missing
@@ -140,4 +141,4 @@ The tests never send requests: the License API is replaced by a fake client. To 
 
 ## License
 
-MIT. The paid plugins that use this package are licensed under the [oweb studio Commercial License](https://owebstudio.com/license).
+MIT. The paid plugins that use this package are licensed under the [oweb studio Commercial License](https://github.com/owebstudio/.github/blob/main/LICENSE.md).

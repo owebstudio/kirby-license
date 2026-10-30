@@ -107,7 +107,7 @@ abstract class TestCase extends BaseTestCase
 			plugin: $plugin,
 			products: $products,
 			name: $name,
-			url: 'https://owebstudio.com/test',
+			url: 'https://owebstudio.lemonsqueezy.com/checkout/buy/test',
 			store: static::STORE,
 			bundle: [static::BUNDLE],
 			client: $this->client()

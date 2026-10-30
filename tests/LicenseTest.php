@@ -696,7 +696,7 @@ class LicenseTest extends TestCase
 		$this->assertSame([
 			'button'  => 'Activate',
 			'dialog'  => null,
-			'link'    => 'https://owebstudio.com/test',
+			'link'    => 'https://owebstudio.lemonsqueezy.com/checkout/buy/test',
 			'locked'  => true,
 			'message' => 'Test Plugin is not activated on example.com. Please ask an administrator to activate it.',
 			'status'  => 'missing',

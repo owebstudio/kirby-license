@@ -10,7 +10,7 @@
     "license",
     "lemonsqueezy"
   ],
-  "homepage": "https://owebstudio.com",
+  "homepage": "https://github.com/owebstudio/kirby-license",
   "support": {
     "email": "support@owebstudio.com",
     "source": "https://github.com/owebstudio/kirby-license"
@@ -19,7 +19,7 @@
     {
       "name": "oweb studio",
       "email": "contact@owebstudio.com",
-      "homepage": "https://owebstudio.com"
+      "homepage": "https://github.com/owebstudio"
     }
   ],
   "require": {

@@ -21,7 +21,7 @@ use Throwable;
  *     plugin: 'owebstudio/instagram-feed',
  *     products: [123456],
  *     name: 'Instagram Feed',
- *     url: 'https://owebstudio.com/kirby/plugins/instagram-feed'
+ *     url: 'https://owebstudio.lemonsqueezy.com/checkout/buy/29afd8d3-78d4-4cd5-a19b-a13c3d3b5e1b'
  * );
  *
  * Kirby::plugin('owebstudio/instagram-feed', $license->extend([
@@ -31,12 +31,12 @@ use Throwable;
  *
  * @package   oweb studio license
  * @author    Ahmet Bora
- * @link      https://owebstudio.com
+ * @link      https://github.com/owebstudio/kirby-license
  * @license   MIT
  */
 class License
 {
-	public const VERSION = '1.0.0';
+	public const VERSION = '1.0.1';
 
 	/**
 	 * LemonSqueezy store of oweb studio
@@ -51,7 +51,7 @@ class License
 	/**
 	 * Terms of the commercial license
 	 */
-	public const TERMS = 'https://owebstudio.com/license';
+	public const TERMS = 'https://github.com/owebstudio/.github/blob/main/LICENSE.md';
 
 	/**
 	 * Reason codes for invalid activations

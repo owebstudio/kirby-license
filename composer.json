@@ -1,0 +1,55 @@
+{
+  "name": "owebstudio/kirby-license",
+  "description": "LemonSqueezy license keys for the paid oweb studio plugins for Kirby",
+  "type": "library",
+  "license": "MIT",
+  "keywords": [
+    "owebstudio",
+    "kirby",
+    "kirby-plugin",
+    "license",
+    "lemonsqueezy"
+  ],
+  "homepage": "https://owebstudio.com",
+  "support": {
+    "email": "support@owebstudio.com",
+    "source": "https://github.com/owebstudio/kirby-license"
+  },
+  "authors": [
+    {
+      "name": "oweb studio",
+      "email": "contact@owebstudio.com",
+      "homepage": "https://owebstudio.com"
+    }
+  ],
+  "require": {
+    "php": ">=8.1"
+  },
+  "require-dev": {
+    "getkirby/cms": "^4.0 || ^5.0",
+    "phpunit/phpunit": "^10.5 || ^11.0 || ^12.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Oweb\\License\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Oweb\\License\\Tests\\": "tests/"
+    }
+  },
+  "bin": [
+    "bin/scope"
+  ],
+  "config": {
+    "allow-plugins": {
+      "getkirby/composer-installer": true
+    },
+    "optimize-autoloader": true,
+    "sort-packages": true
+  },
+  "extra": {
+    "kirby-cms-path": false
+  }
+}

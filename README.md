@@ -8,8 +8,9 @@ You don't need to install this package yourself. Every paid oweb studio plugin c
 
 - **Local and staging sites need no key.** `localhost`, `*.test`, `*.local`, `*.ddev.site`, loopback IPs and the `staging.`, `dev.` and `test.` subdomains are free to use.
 - **Live sites need a key.** Open the Panel's System view (Kirby 5 and newer) and click the license status of the plugin, or use the button in the plugin's notice. Enter the key from your purchase email. Only admins can activate and deactivate licenses.
-- **One activation per site.** The key is activated for the domain of the site. `www.`, `staging.`, `dev.` and `test.` subdomains count as the same site. Keys of the former oweb studio bundle unlock every paid plugin with a single activation.
+- **One activation per site.** The key is activated for the domain of the site. `www.`, `staging.`, `dev.` and `test.` subdomains count as the same site. Keys of the former oweb studio bundle unlock the plugins of the bundle with a single activation.
 - **Your website keeps working.** Without a key the plugin locks its main Panel features and shows a notice. The frontend of your site never breaks.
+- **Free plugins with Pro features** need a key for Pro only. Without a key the System view shows "Free", nothing is locked and there is no notice. On local and staging sites the Pro features work without a key, so you can try them first.
 
 ### Other staging hosts
 
@@ -78,7 +79,7 @@ Kirby::plugin(
 );
 ```
 
-- `products`: the plugin's own Lemon Squeezy product IDs. The legacy bundle is accepted automatically.
+- `products`: the plugin's own Lemon Squeezy product IDs. The legacy bundle is accepted automatically, pass `bundle: []` to turn that off.
 - `url`: the plugin's Lemon Squeezy checkout, linked as "Buy a license" in the license dialog.
 - `extend()` adds the license dialog to the Panel's system area.
 - `args()` adds the license to the System view on Kirby 5 and newer. Kirby 4 has no plugin licenses, so it adds nothing there. Pass it as the last argument, after the positional ones.
@@ -88,14 +89,16 @@ Kirby::plugin(
 | Method | Description |
 | --- | --- |
 | `$license->isLicensed()` | `true` with a valid key or on a local or staging host |
-| `$license->isLocked()` | The opposite: lock the plugin's main features |
+| `$license->isLocked()` | The opposite: lock the plugin's main features (always `false` with an optional key) |
+| `$license->isPro()` | Same as `isLicensed()`, for plugins with an [optional key](#optional-key-free-and-pro) |
+| `$license->isOptional()` | `true` if the key is optional |
 | `$license->status()` | `Status::Active`, `Exempt`, `Invalid` or `Missing` |
 | `$license->message()` | Translated notice for the Panel, `null` if not locked |
 | `$license->panel()` | State for Panel components (see below) |
 | `$license->dialog()` | Panel path of the license dialog |
 | `License::for('owebstudio/instagram-feed')` | The license object of a plugin |
 
-`isLicensed()`, `isLocked()`, `status()` and `message()` never send a request and never throw, so they are safe to use in templates, hooks and the frontend.
+`isLicensed()`, `isLocked()`, `isPro()`, `status()` and `message()` never send a request and never throw, so they are safe to use in templates, hooks and the frontend.
 
 `panel()` validates the key again when it is due (Panel requests only) and returns:
 
@@ -108,6 +111,7 @@ Kirby::plugin(
     'message' => 'Instagram Feed is not activated on example.com.',
     'status'  => 'missing',   // active, exempt, invalid, missing
     'theme'   => 'notice',    // for <k-box>
+    'tier'    => 'free',      // pro with a valid key or on a local or staging host
 ]
 ```
 
@@ -129,6 +133,37 @@ Check `isLocked()` in your API routes and dialogs too. The Panel lock alone is o
 - Never break the frontend of a site. Snippets and templates keep rendering.
 - Lock the main action in the Panel (saving in an editor, a paid API call, editing the field), not the whole Panel.
 - Never block a customer's checkout.
+
+### Optional key (Free and Pro)
+
+For a free plugin that sells Pro features, pass `optional: true`. The key then only unlocks Pro, and the plugin is never locked:
+
+```php
+$license = new License(
+    plugin: 'owebstudio/analytics',
+    products: [123456],
+    name: 'Analytics',
+    url: 'https://owebstudio.lemonsqueezy.com/checkout/buy/…',
+    optional: true,
+    bundle: [] // keys of the legacy bundle don't unlock Pro
+);
+
+if ($license->isPro() === true) {
+    // Pro features
+}
+```
+
+| Site | System view | `isPro()` | `panel()['tier']` |
+| --- | --- | --- | --- |
+| Live, no key | "Free", no warning | `false` | `free` |
+| Live, valid key | "Pro" | `true` | `pro` |
+| Local or staging | "Test environment" | `true` | `pro` |
+| Live, key no longer valid | "Invalid license" | `false` | `free` |
+
+- `isLocked()` is always `false` and `message()` always `null`, so there is no license notice. Show your own hint next to the Pro features, with `panel()['button']` ("Activate Pro") and `panel()['dialog']`.
+- The license dialog activates "Analytics Pro" and links `url` as "Buy a license".
+- Check `isPro()` in the API routes and dialogs of the Pro features too.
+- Kirby 4 has no plugin licenses in the System view, so on Kirby 4 the plugin's own UI needs the button to the dialog.
 
 ## Development
 

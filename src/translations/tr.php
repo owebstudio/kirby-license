@@ -5,12 +5,15 @@ return [
 
 	'status.active'  => 'Etkin',
 	'status.exempt'  => 'Test ortamı',
+	'status.free'    => 'Ücretsiz',
 	'status.invalid' => 'Geçersiz lisans',
 	'status.missing' => 'Lütfen etkinleştirin',
+	'status.pro'     => 'Pro',
 
 	'button.activate'   => 'Etkinleştir',
 	'button.deactivate' => 'Devre dışı bırak',
 	'button.license'    => 'Lisans',
+	'button.pro'        => 'Pro\'yu etkinleştir',
 
 	'dialog.active'    => '<strong>{plugin}</strong>, <strong>{domain}</strong> için etkin.',
 	'dialog.admin'     => 'Lisansları sadece yöneticiler etkinleştirebilir.',
@@ -20,6 +23,7 @@ return [
 	'dialog.key'       => 'Lisans anahtarı: {key}',
 	'dialog.other'     => 'Bu lisans <strong>{domain}</strong> için etkin. Burada etkinleştirmek anahtarın bir etkinleştirme hakkını daha kullanır.',
 	'dialog.product'   => 'Ürün: {product}',
+	'dialog.pro'       => 'Lisans anahtarınızı girin; <strong>{plugin}</strong>, <strong>{domain}</strong> için etkinleştirilecek.',
 	'dialog.validated' => 'Son doğrulama: {date}',
 
 	'field.key'             => 'Lisans anahtarı',

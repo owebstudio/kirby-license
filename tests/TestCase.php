@@ -101,15 +101,18 @@ abstract class TestCase extends BaseTestCase
 	protected function license(
 		array $products = [100],
 		string $plugin = 'owebstudio/test',
-		string $name = 'Test Plugin'
+		string $name = 'Test Plugin',
+		bool $optional = false,
+		array $bundle = [self::BUNDLE]
 	): License {
 		return new License(
 			plugin: $plugin,
 			products: $products,
 			name: $name,
 			url: 'https://owebstudio.lemonsqueezy.com/checkout/buy/test',
+			optional: $optional,
 			store: static::STORE,
-			bundle: [static::BUNDLE],
+			bundle: $bundle,
 			client: $this->client()
 		);
 	}

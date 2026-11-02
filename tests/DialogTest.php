@@ -10,18 +10,18 @@ use Oweb\License\Dialog;
 
 class DialogTest extends TestCase
 {
-	protected function dialog(): Dialog
+	protected function dialog(bool $optional = false): Dialog
 	{
-		return new Dialog($this->license());
+		return new Dialog($this->license(optional: $optional));
 	}
 
-	protected function load(string|null $user = 'admin@example.com'): array
+	protected function load(string|null $user = 'admin@example.com', bool $optional = false): array
 	{
 		if ($user !== null) {
 			App::instance()->impersonate($user);
 		}
 
-		return $this->dialog()->load();
+		return $this->dialog($optional)->load();
 	}
 
 	public function testLoadMissing(): void
@@ -133,6 +133,69 @@ class DialogTest extends TestCase
 		$this->assertSame(['exempt'], array_keys($dialog['props']['fields']));
 		$this->assertStringContainsString('<strong>example.test</strong>', (string)$dialog['props']['fields']['exempt']['text']);
 		$this->assertFalse($dialog['props']['submitButton']);
+	}
+
+	public function testLoadOptionalMissing(): void
+	{
+		$this->app();
+		$dialog = $this->load(optional: true);
+
+		$this->assertSame(['domain', 'key'], array_keys($dialog['props']['fields']));
+		$this->assertSame(
+			'Enter your license key to activate <strong>Test Plugin Pro</strong> for <strong>example.com</strong>.',
+			(string)$dialog['props']['fields']['domain']['text']
+		);
+		$this->assertStringContainsString('href="https://owebstudio.lemonsqueezy.com/checkout/buy/test"', (string)$dialog['props']['fields']['key']['help']);
+		$this->assertSame('Activate Pro', $dialog['props']['submitButton']['text']);
+	}
+
+	public function testLoadOptionalActive(): void
+	{
+		$this->app();
+		$this->store([]);
+
+		$dialog = $this->load(optional: true);
+
+		$this->assertSame(['license', 'deactivate'], array_keys($dialog['props']['fields']));
+		$this->assertStringContainsString('<strong>Test Plugin Pro</strong> is activated for <strong>example.com</strong>.', (string)$dialog['props']['fields']['license']['text']);
+		$this->assertSame('Deactivate', $dialog['props']['submitButton']['text']);
+	}
+
+	public function testLoadOptionalExempt(): void
+	{
+		$this->app('http://example.test');
+
+		$dialog = $this->load(optional: true);
+
+		$this->assertStringContainsString('<strong>Test Plugin Pro</strong> needs no license key', (string)$dialog['props']['fields']['exempt']['text']);
+		$this->assertFalse($dialog['props']['submitButton']);
+	}
+
+	public function testLoadOptionalInvalid(): void
+	{
+		$this->app();
+		$this->store(['valid' => false, 'error' => 'disabled']);
+
+		$dialog = $this->load(optional: true);
+
+		$this->assertSame(['invalid', 'domain', 'key'], array_keys($dialog['props']['fields']));
+		$this->assertStringContainsString('The license of <strong>Test Plugin Pro</strong> is no longer valid: The license key has been disabled.', (string)$dialog['props']['fields']['invalid']['text']);
+	}
+
+	public function testSubmitActivateOptional(): void
+	{
+		$this->app('https://example.com', [
+			'request' => ['body' => ['key' => static::KEY]]
+		]);
+		App::instance()->impersonate('admin@example.com');
+
+		$this->respond($this->body());
+		$this->respond($this->body('activated'));
+
+		$dialog = $this->dialog(optional: true);
+
+		$this->assertSame(['message' => 'The license has been activated'], $dialog->submit());
+		$this->assertTrue($this->license(optional: true)->isPro());
 	}
 
 	public function testLoadRefreshes(): void

@@ -58,22 +58,30 @@ enum Status: string
 
 	/**
 	 * Translated label for the Panel
+	 *
+	 * @param bool $optional Plugin with an optional key (Free and Pro)
 	 */
-	public function label(): string
+	public function label(bool $optional = false): string
 	{
-		return Translation::get('status.' . $this->value);
+		return Translation::get(match (true) {
+			$optional && $this === static::Active  => 'status.pro',
+			$optional && $this === static::Missing => 'status.free',
+			default                                => 'status.' . $this->value
+		});
 	}
 
 	/**
 	 * Theme for buttons and boxes in the Panel
+	 *
+	 * @param bool $optional Plugin with an optional key (Free and Pro)
 	 */
-	public function theme(): string
+	public function theme(bool $optional = false): string|null
 	{
 		return match ($this) {
 			static::Active  => 'positive',
 			static::Exempt  => 'info',
 			static::Invalid => 'negative',
-			static::Missing => 'love'
+			static::Missing => $optional === true ? null : 'love'
 		};
 	}
 }

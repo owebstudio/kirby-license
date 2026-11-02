@@ -701,10 +701,114 @@ class LicenseTest extends TestCase
 			'message' => 'Test Plugin is not activated on example.com. Please ask an administrator to activate it.',
 			'status'  => 'missing',
 			'theme'   => 'notice',
+			'tier'    => 'free',
 		], $license->panel());
 
 		App::instance()->impersonate('admin@example.com');
 		$this->assertSame('oweb-license/owebstudio/test', $license->panel()['dialog']);
+
+		$this->store([]);
+		$this->assertSame('pro', $license->panel()['tier']);
+		$this->assertSame('License', $license->panel()['button']);
+	}
+
+	public function testOptionalMissing(): void
+	{
+		$this->app();
+		$license = $this->license(optional: true);
+
+		$this->assertSame(Status::Missing, $license->status());
+		$this->assertTrue($license->isOptional());
+		$this->assertFalse($license->isLocked());
+		$this->assertFalse($license->isLicensed());
+		$this->assertFalse($license->isPro());
+		$this->assertNull($license->message());
+
+		App::instance()->impersonate('admin@example.com');
+
+		$this->assertSame([
+			'button'  => 'Activate Pro',
+			'dialog'  => 'oweb-license/owebstudio/test',
+			'link'    => 'https://owebstudio.lemonsqueezy.com/checkout/buy/test',
+			'locked'  => false,
+			'message' => null,
+			'status'  => 'missing',
+			'theme'   => 'notice',
+			'tier'    => 'free',
+		], $license->panel());
+	}
+
+	public function testOptionalActive(): void
+	{
+		$this->app();
+		$this->store([]);
+
+		$license = $this->license(optional: true);
+
+		$this->assertSame(Status::Active, $license->status());
+		$this->assertFalse($license->isLocked());
+		$this->assertTrue($license->isPro());
+		$this->assertSame('pro', $license->panel()['tier']);
+		$this->assertSame('License', $license->panel()['button']);
+	}
+
+	public function testOptionalExempt(): void
+	{
+		$this->app('http://example.test');
+		$license = $this->license(optional: true);
+
+		$this->assertSame(Status::Exempt, $license->status());
+		$this->assertTrue($license->isPro());
+		$this->assertSame('pro', $license->panel()['tier']);
+	}
+
+	public function testOptionalInvalid(): void
+	{
+		$this->app();
+		$this->store(['valid' => false]);
+
+		$license = $this->license(optional: true);
+
+		$this->assertSame(Status::Invalid, $license->status());
+		$this->assertFalse($license->isLocked());
+		$this->assertFalse($license->isPro());
+		$this->assertNull($license->message());
+		$this->assertFalse($license->panel()['locked']);
+		$this->assertSame('free', $license->panel()['tier']);
+		$this->assertSame('invalid', $license->panel()['status']);
+	}
+
+	public function testWithoutBundle(): void
+	{
+		$this->app();
+		$this->store(['product' => static::BUNDLE]);
+
+		$license = $this->license([100], bundle: []);
+
+		$this->assertSame([100], $license->products());
+		$this->assertSame(Status::Missing, $license->status());
+
+		$this->expectException(InvalidArgumentException::class);
+		$this->expectExceptionMessage('The license key is not valid.');
+
+		$license->activate(static::KEY);
+	}
+
+	public function testActivateBundleKeyWithoutBundle(): void
+	{
+		$this->app();
+		$this->respond($this->body(product: static::BUNDLE));
+
+		try {
+			$this->license([100], bundle: [], optional: true)->activate(static::KEY);
+			$this->fail('No exception');
+		} catch (InvalidArgumentException $e) {
+			$this->assertSame('The license key is not valid.', $e->getMessage());
+		}
+
+		// no activation used
+		$this->assertSame(['validate'], array_column($this->requests, 'action'));
+		$this->assertFileDoesNotExist($this->file());
 	}
 
 	public function testPanelRefreshesInPanelRequests(): void
@@ -818,5 +922,46 @@ class LicenseTest extends TestCase
 		$this->assertSame('active', $status->value());
 		$this->assertSame('Active', $status->label());
 		$this->assertSame('positive', $status->theme());
+	}
+
+	public function testArgsForOptionalKey(): void
+	{
+		if (class_exists(PluginLicense::class) === false) {
+			$this->markTestSkipped('Kirby 4 has no plugin licenses');
+		}
+
+		$status = function (string $url = 'https://example.com') {
+			App::destroy();
+			$this->app($url);
+
+			$license = $this->license(optional: true);
+			$plugin  = new Plugin(name: 'owebstudio/test', extends: [], root: $this->tmp, license: $license->args()['license']);
+
+			return $plugin->license()->status()->toArray();
+		};
+
+		// no warning without a key
+		$free = $status();
+		$this->assertSame('missing', $free['value']);
+		$this->assertSame('Free', $free['label']);
+		$this->assertSame('key', $free['icon']);
+		$this->assertNull($free['theme']);
+		$this->assertSame('oweb-license/owebstudio/test', $free['dialog']);
+
+		$exempt = $status('http://example.test');
+		$this->assertSame('Test environment', $exempt['label']);
+		$this->assertSame('info', $exempt['theme']);
+
+		$this->store([]);
+		$pro = $status();
+		$this->assertSame('active', $pro['value']);
+		$this->assertSame('Pro', $pro['label']);
+		$this->assertSame('positive', $pro['theme']);
+
+		$this->store(['valid' => false]);
+		$invalid = $status();
+		$this->assertSame('invalid', $invalid['value']);
+		$this->assertSame('Invalid license', $invalid['label']);
+		$this->assertSame('negative', $invalid['theme']);
 	}
 }

@@ -48,7 +48,7 @@ class Dialog
 			Status::Exempt => false,
 			default => [
 				'icon'  => 'key',
-				'text'  => Translation::get('button.activate'),
+				'text'  => Translation::get($license->isOptional() === true ? 'button.pro' : 'button.activate'),
 				'theme' => 'positive'
 			]
 		} : false;
@@ -66,6 +66,17 @@ class Dialog
 				]
 			]
 		];
+	}
+
+	/**
+	 * Returns the name of what the key unlocks:
+	 * the plugin, or its Pro features
+	 */
+	protected function product(): string
+	{
+		$name = $this->license->name();
+
+		return $this->license->isOptional() === true ? $name . ' Pro' : $name;
 	}
 
 	/**
@@ -135,7 +146,7 @@ class Dialog
 
 		if ($activation?->valid === false) {
 			$fields['invalid'] = $this->info('negative', Translation::html('dialog.invalid', [
-				'plugin' => $license->name(),
+				'plugin' => $this->product(),
 				'reason' => License::explain($activation->error ?? 'invalid')
 			]));
 		}
@@ -145,8 +156,9 @@ class Dialog
 			return $fields;
 		}
 
-		$fields['domain'] = $this->info('info', Translation::html('dialog.domain', [
-			'domain' => $license->host()->domain()
+		$fields['domain'] = $this->info('info', Translation::html($license->isOptional() === true ? 'dialog.pro' : 'dialog.domain', [
+			'domain' => $license->host()->domain(),
+			'plugin' => $this->product()
 		]));
 
 		if ($other !== null) {
@@ -180,7 +192,7 @@ class Dialog
 		$lines = [
 			Translation::html('dialog.active', [
 				'domain' => $activation->domain,
-				'plugin' => $license->name()
+				'plugin' => $this->product()
 			]),
 			Translation::html('dialog.product', [
 				'product' => trim(($activation->productName ?? '?') . ' ' . ($activation->variantName ? '(' . $activation->variantName . ')' : ''))
@@ -223,7 +235,7 @@ class Dialog
 		return [
 			'exempt' => $this->info('info', Translation::html('dialog.exempt', [
 				'host'   => $this->license->host()->host(),
-				'plugin' => $this->license->name()
+				'plugin' => $this->product()
 			]))
 		];
 	}

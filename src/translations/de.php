@@ -5,12 +5,15 @@ return [
 
 	'status.active'  => 'Aktiv',
 	'status.exempt'  => 'Testumgebung',
+	'status.free'    => 'Free',
 	'status.invalid' => 'Ungültige Lizenz',
 	'status.missing' => 'Bitte aktivieren',
+	'status.pro'     => 'Pro',
 
 	'button.activate'   => 'Aktivieren',
 	'button.deactivate' => 'Deaktivieren',
 	'button.license'    => 'Lizenz',
+	'button.pro'        => 'Pro aktivieren',
 
 	'dialog.active'    => '<strong>{plugin}</strong> ist für <strong>{domain}</strong> aktiviert.',
 	'dialog.admin'     => 'Nur Administratoren können Lizenzen aktivieren.',
@@ -20,6 +23,7 @@ return [
 	'dialog.key'       => 'Lizenzschlüssel: {key}',
 	'dialog.other'     => 'Diese Lizenz ist für <strong>{domain}</strong> aktiviert. Eine Aktivierung hier verbraucht eine weitere Aktivierung des Schlüssels.',
 	'dialog.product'   => 'Produkt: {product}',
+	'dialog.pro'       => 'Gib deinen Lizenzschlüssel ein, um <strong>{plugin}</strong> für <strong>{domain}</strong> zu aktivieren.',
 	'dialog.validated' => 'Zuletzt geprüft: {date}',
 
 	'field.key'             => 'Lizenzschlüssel',

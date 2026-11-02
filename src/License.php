@@ -36,7 +36,7 @@ use Throwable;
  */
 class License
 {
-	public const VERSION = '1.0.1';
+	public const VERSION = '1.1.0';
 
 	/**
 	 * LemonSqueezy store of oweb studio
@@ -71,8 +71,11 @@ class License
 	 *                        the legacy bundle is added automatically
 	 * @param string|null $name Plugin name for the Panel
 	 * @param string|null $url Where to buy a license
+	 * @param bool $optional The key only unlocks the Pro features,
+	 *                       the plugin is never locked
 	 * @param int|null $store Store ID (for tests)
-	 * @param array|null $bundle Bundle product IDs (for tests)
+	 * @param array|null $bundle Bundle product IDs; `[]` if bundle keys
+	 *                           should not unlock the plugin
 	 * @param \Oweb\License\Client|null $client API client (for tests)
 	 * @param string|null $file Path of the license file (for tests)
 	 */
@@ -81,6 +84,7 @@ class License
 		protected array $products,
 		protected string|null $name = null,
 		protected string|null $url = null,
+		protected bool $optional = false,
 		protected int|null $store = null,
 		protected array|null $bundle = null,
 		protected Client|null $client = null,
@@ -322,16 +326,35 @@ class License
 	 */
 	public function isLicensed(): bool
 	{
-		return $this->isLocked() === false;
+		return $this->status()->isLocked() === false;
 	}
 
 	/**
 	 * Checks if the plugin should lock its main features.
+	 * Always `false` for plugins with an optional key.
 	 * Never sends a request.
 	 */
 	public function isLocked(): bool
 	{
-		return $this->status()->isLocked();
+		return $this->optional === false && $this->isLicensed() === false;
+	}
+
+	/**
+	 * Checks if the key is optional (Free and Pro)
+	 */
+	public function isOptional(): bool
+	{
+		return $this->optional;
+	}
+
+	/**
+	 * Checks if the Pro features of a plugin with an optional key
+	 * are unlocked: a valid key is activated, or the site runs on
+	 * a local or staging host. Never sends a request.
+	 */
+	public function isPro(): bool
+	{
+		return $this->isLicensed();
 	}
 
 	/**
@@ -341,7 +364,7 @@ class License
 	{
 		$status = $this->status();
 
-		if ($status->isLocked() === false) {
+		if ($this->isLocked() === false) {
 			return null;
 		}
 
@@ -375,15 +398,21 @@ class License
 		}
 
 		$status = $this->status();
+		$button = match (true) {
+			$status->isLocked() === false => 'button.license',
+			$this->optional === true      => 'button.pro',
+			default                       => 'button.activate'
+		};
 
 		return [
-			'button'  => Translation::get($status->isLocked() === true ? 'button.activate' : 'button.license'),
+			'button'  => Translation::get($button),
 			'dialog'  => $this->canManage() === true ? $this->dialog() : null,
 			'link'    => $this->url,
-			'locked'  => $status->isLocked(),
+			'locked'  => $this->isLocked(),
 			'message' => $this->message(),
 			'status'  => $status->value,
 			'theme'   => $status === Status::Invalid ? 'negative' : 'notice',
+			'tier'    => $this->isPro() === true ? 'pro' : 'free',
 		];
 	}
 
@@ -413,9 +442,9 @@ class License
 			status: new PluginLicenseStatus(
 				value: $status->value,
 				icon: $status->icon(),
-				label: $status->label(),
+				label: $status->label($this->optional),
 				dialog: $this->dialog(),
-				theme: $status->theme()
+				theme: $status->theme($this->optional)
 			)
 		);
 	}

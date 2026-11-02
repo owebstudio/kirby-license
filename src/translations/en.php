@@ -5,12 +5,15 @@ return [
 
 	'status.active'  => 'Active',
 	'status.exempt'  => 'Test environment',
+	'status.free'    => 'Free',
 	'status.invalid' => 'Invalid license',
 	'status.missing' => 'Please activate',
+	'status.pro'     => 'Pro',
 
 	'button.activate'   => 'Activate',
 	'button.deactivate' => 'Deactivate',
 	'button.license'    => 'License',
+	'button.pro'        => 'Activate Pro',
 
 	'dialog.active'    => '<strong>{plugin}</strong> is activated for <strong>{domain}</strong>.',
 	'dialog.admin'     => 'Only administrators can activate licenses.',
@@ -20,6 +23,7 @@ return [
 	'dialog.key'       => 'License key: {key}',
 	'dialog.other'     => 'This license is activated for <strong>{domain}</strong>. Activating it here uses another activation of the key.',
 	'dialog.product'   => 'Product: {product}',
+	'dialog.pro'       => 'Enter your license key to activate <strong>{plugin}</strong> for <strong>{domain}</strong>.',
 	'dialog.validated' => 'Last validated: {date}',
 
 	'field.key'             => 'License key',
